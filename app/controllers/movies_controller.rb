@@ -3,14 +3,31 @@ class MoviesController < ApplicationController
   def index
     @all_ratings = Movie.all_ratings
 
-    if params[:ratings].present?
-      @ratings_to_show = params[:ratings].keys
-    else
-      @ratings_to_show = @all_ratings
-    end
+    if params[:ratings].present? || params[:sort_by].present?
+      if params[:ratings].present?
+        @ratings_to_show = params[:ratings].keys
+      else
+        @ratings_to_show = @all_ratings
+      end
 
     #handles the sorting
-    @sort_by = params[:sort_by]
+      @sort_by = params[:sort_by]
+
+      session[:ratings] = @ratings_to_show
+      session[:sort_by] = @sort_by
+
+    else 
+      @ratings_to_show = session[:ratings] || @all_ratings
+      @sort_by = session[:sort_by]
+
+      #URL with params
+      if session[:ratings].present? || session[:sort_by].present?
+        redirect_to movies_path(
+          ratings: @ratings_to_show.each_with_object({}) { |rating, hash| hash[rating] = '1' },
+          sort_by: @sort_by
+        ) and return
+      end
+    end
 
     @movies = Movie.with_ratings(@ratings_to_show, @sort_by)
   end
