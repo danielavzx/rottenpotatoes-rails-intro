@@ -9,7 +9,10 @@ class MoviesController < ApplicationController
       @ratings_to_show = @all_ratings
     end
 
-    @movies = Movie.with_ratings(@ratings_to_show)
+    #handles the sorting
+    @sort_by = params[:sort_by]
+
+    @movies = Movie.with_ratings(@ratings_to_show, @sort_by)
   end
 
   def show

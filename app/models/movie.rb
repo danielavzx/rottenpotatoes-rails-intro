@@ -6,11 +6,18 @@ class Movie < ActiveRecord::Base
     ['G', 'PG', 'PG-13', 'R']
   end
 
-  def self.with_ratings(ratings_list)
+  def self.with_ratings(ratings_list, sort_by = nil)
     if ratings_list.blank?
-      Movie.all
+      movies = Movie.all
     else
-      Movie.where('LOWER(rating) IN (?)', ratings_list.map(&:downcase))
+      movies = Movie.where('LOWER(rating) IN (?)', ratings_list.map(&:downcase))
     end
+
+    if sort_by.present?
+      movies = movies.order(sort_by)
+    end
+
+    movies
+
   end
 end
